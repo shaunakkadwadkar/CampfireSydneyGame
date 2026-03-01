@@ -32,7 +32,7 @@ shark_img = pygame.transform.scale(pygame.image.load("shark.png"), (120,80))
 plastic_img = pygame.transform.scale(pygame.image.load("plastic.png"), (60,60))
 
 # ---------------- MENU ----------------
-def menu():
+async def menu():
     options = ["EASY","MEDIUM","HARD"]
     selected = None
 
@@ -58,11 +58,12 @@ def menu():
 
         pygame.display.update()
         clock.tick(FPS)
+        await asyncio.sleep(0)
 
     return selected
 
 # ---------------- GAME LOOP ----------------
-async def game(difficulty):
+async def main(difficulty):
 
     player = player_img.get_rect(center=(WIDTH//4, HEIGHT//2))
     health = 100
@@ -171,13 +172,13 @@ async def game(difficulty):
         screen.blit(player_img,player)
 
         if health <= 0:
-            return death(distance)
+            return await death(distance)
 
         pygame.display.update()
         await asyncio.sleep(0)
 
 # ---------------- DEATH SCREEN ----------------
-def death(distance):
+async def death(distance):
     while True:
         screen.blit(bg,(0,0))
 
@@ -193,10 +194,14 @@ def death(distance):
 
         pygame.display.update()
         clock.tick(FPS)
+        await asyncio.sleep(0)
 
 # ---------------- RUN ----------------
-while True:
-    difficulty = menu()
-    if difficulty is None:
-        break
-    game(difficulty)
+async def run():
+    while True:
+        difficulty = await menu()
+        if difficulty is None:
+            break
+        await main(difficulty)
+
+asyncio.run(run())
